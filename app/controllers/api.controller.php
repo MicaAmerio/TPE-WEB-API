@@ -1,12 +1,12 @@
 <?php
-    require_once 'app/views/product.api.view.php';
+    require_once 'app/views/api.view.php';
     
     abstract class ApiController {
         protected $view;
         private $data;
         
         function __construct() {
-            $this->view = new productapiView();
+            $this->view = new ApiView();
             $this->data = file_get_contents('php://input');
         }
 
