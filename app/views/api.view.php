@@ -1,4 +1,5 @@
 <?php
+require_once 'app/views/api.view.php';
     class apiView {
         public function response($data, $status = 200) {
             header('Content-type: application/json');

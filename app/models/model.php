@@ -10,10 +10,6 @@ class Model {
         $this->conexion = $this->createConection();
     }
 
-    public function devolverconexion(){ //conexión a la base de datos me devuelve "createConection"
-        return $this->conexion;
-    }
-
     public function createConection() {
         try {
             $pdo = new PDO("mysql:host=" .MYSQL_HOST . ";dbname=" . MYSQL_DB . ";charset=utf8", MYSQL_USER, MYSQL_PASS);
@@ -23,4 +19,10 @@ class Model {
         }
         return $pdo;
     }
+
+    public function devolverconexion(){ //conexión a la base de datos me devuelve "createConection"
+        return $this->conexion;
+    }
+
+   
 }

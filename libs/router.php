@@ -1,5 +1,8 @@
 <?php
 
+require_once './libs/request.php';
+require_once './libs/response.php';
+
 class Route {
     private $url;
     private $verb;
@@ -29,39 +32,53 @@ class Route {
                 return false;
             } //es un parametro
             else
-            $this->params[$part] = $partsURL[$key];
+            $this->params[''.substr($part,1)] = $partsURL[$key];
         }
         return true;
     }
-    public function run(){
+    public function run($request, $response){
         $controller = $this->controller;  
         $method = $this->method;
-        $params = $this->params;
+        $request->params = (object) $this->params;
        
-        (new $controller())->$method($params);
+        (new $controller())->$method($request, $response);
     }
 }
 
 class Router {
     private $routeTable = [];
+    private $middlewares = [];
     private $defaultRoute;
+    private $request;
+    private $response;
 
     public function __construct() {
-        $this->defaultRoute = null;
+     $this->defaultRoute = null;
+        $this->request = new Request();
+        $this->response = new Response();
     }
 
     public function route($url, $verb) {
+        foreach ($this->middlewares as $middleware) {
+            $middleware->run($this->request, $this->response);
+        }
         //$ruta->url //no compila!
         foreach ($this->routeTable as $route) {
             if($route->match($url, $verb)){
                 //TODO: ejecutar el controller//ejecutar el controller
                 // pasarle los parametros
-                $route->run();
+                $route->run($this->request, $this->response);
                 return;
             }
         }
-        
-        }
+        //Si ninguna ruta coincide con el pedido y se configuró ruta por defecto.
+        if ($this->defaultRoute != null)
+            $this->defaultRoute->run($this->request, $this->response);
+    
+          }
+         public function addMiddleware($middleware) {
+        $this->middlewares[] = $middleware;
+    }
     
     public function addRoute ($url, $verb, $controller, $method) {
         $this->routeTable[] = new Route($url, $verb, $controller, $method);
@@ -71,4 +88,3 @@ class Router {
         $this->defaultRoute = new Route("", "", $controller, $method);
     }
 }
-

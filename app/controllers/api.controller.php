@@ -1,7 +1,7 @@
 <?php
-    require_once 'app/views/api.view.php';
+require_once './app/views/api.view.php';
     
-    abstract class ApiController {
+abstract class ApiController {
         protected $view;
         private $data;
         
