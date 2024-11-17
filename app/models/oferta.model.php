@@ -10,46 +10,33 @@ class OfertaModel extends Model{
         $this->model = new Model();
     }
 
-     //Función que pide a la DB todas las tareas
-    /* public function get(){
-        $pdo = $this->model->devolverconexion();
-
-        $sql = 'select * from oferta order by descuento DESC';
-        $query = $pdo->prepare($sql);
-        $query->execute();
-    
-        $ofertas = $query->fetchAll(PDO::FETCH_OBJ);
-    
-        return $ofertas;
-    }
-    */
-    public function getAll($descuento = null, $orden = 'ASC') {
-        // Obtener la conexión PDO directamente (ajusta según tu implementación)
+    public function getAll($filtros = [], $ordenarPor = null, $orden = 'ASC') {
         $pdo = $this->model->devolverconexion(); 
     
-        // Validar el tipo de orden
-        $orden = strtoupper($orden) === 'DESC' ? 'DESC' : 'ASC';
-    
-        // Base de la consulta
         $sql = "SELECT * FROM oferta";
         $valores = [];
     
-        // Agregar el filtro opcional por descuento
-        if (!empty($descuento)) {
-            $sql .= " WHERE descuento <= ?";
-            $valores[] = $descuento;
+        //filtros opcionales
+        if (!empty($filtros['id_producto'])) {
+            $sql .= " AND id_producto = ?";
+            $valores[] = $filtros['id_producto'];
+        }
+        if (!empty($filtros['descuento_min'])) {//trae productos con descuentos hasta el valor pasado por parametro
+            $sql .= " AND descuento <= ?";
+            $valores[] = $filtros['descuento_min'];
+        }
+        if (!empty($filtros['nombre'])) {
+            $sql .= " AND nombre = ?";
+            $valores[] = $filtros['nombre'];
+        }
+       
+        // Si existe $ordenarPor 
+        if ($ordenarPor) {
+                $sql .= " ORDER BY $ordenarPor $orden";
         }
     
-        // Agregar la ordenación por el campo 'descuento'
-        $sql .= " ORDER BY descuento $orden";
-    
-        // Preparar la consulta
         $query = $pdo->prepare($sql);
-    
-        // Ejecutar la consulta con los valores bindados
         $query->execute($valores);
-    
-        // Obtener y retornar los resultados
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
     

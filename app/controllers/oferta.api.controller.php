@@ -11,34 +11,29 @@ require_once 'app/controllers/api.controller.php';
         parent::__construct();
         $this->model = new OfertaModel();
     }
-  
-   /* public function getAll(){
-        $ofertas = $this->model->get();
-        
-        if($ofertas){
-             return $this->view->response($ofertas, 200);
-        }else{
-            return $this->view->response("No se encontraron ofertas", 400);
-        */
-        public function getAll() {
+      public function getAll() {
             // Obtener filtros y parámetros de ordenamiento desde la URL
-            $descuento = $_GET['descuento'] ?? null;
-            $orden = strtoupper($_GET['orden'] ?? 'ASC'); // Ejemplo: ?orden=DESC
+         $filtros = [
+             'id_producto' => $_GET['id_producto'] ?? null,
+             'descuento_min' => $_GET['descuento_min'] ?? null,
+             'nombre' => $_GET['nombre'] ?? null,
+         ];
+ 
+         $ordenarPor = $_GET['campo'] ?? null; // Ejemplo: ?campo=descuento
+         $orden = strtoupper($_GET['orden'] ?? 'ASC'); // Ejemplo: ?orden=DESC
+ 
+         // solo permitir ASC o DESC
+         if ($orden !== 'ASC' && $orden !== 'DESC') {
+             $this->view->response("Orden no válido. Solo se permite 'ASC' o 'DESC'.", 400);
+             return;
+         }
+ 
+         $ofertas = $this->model->getAll($filtros, $ordenarPor, $orden);
+         $this->view->response($ofertas, 200);
+ 
+     }
         
-            // Validar el orden (solo permitir ASC o DESC)
-            if ($orden !== 'ASC' && $orden !== 'DESC') {
-                $this->view->response("Orden no válido. Solo se permite 'ASC' o 'DESC'.", 400);
-                return;
-            }
-        
-            // Llamar al modelo con los parámetros
-            $ofertas = $this->model->getAll($descuento, $orden);
-            $this->view->response($ofertas, 200);
-        }
-        
-    
-
-    public function get($req){
+         public function get($req){
         $id = $req->params->id;
         $oferta = $this->model->getOfertas($id);
 
@@ -62,41 +57,29 @@ require_once 'app/controllers/api.controller.php';
         }else{
             return $this->view->response("Datos Incompletos", 400);
         }
-    } 
-
-    public function updateOferta($req){
-        $id = $req->params->id;
-        $oferta = $this->model->getOfertas($id);
-
-        if(!$oferta){
-            $this->view->response("No existe oferta con ese id");
-        }
-        else{
+      }
+        public function updateOferta($req){
+            $id = $req->params->id;
+    
+            $oferta = $this->model->getOfertas($id);
+    
+            if(!$oferta){
+                return $this->view->response("No existe oferta con id = $id", 404);
+            }
+             
             $id_producto = $req->body->id_producto;
             $nombre = $req->body->nombre;
-            $descuento = $req->body->descuento;
-
-            if(isset($id_producto, $nombre, $descuento)){
-                $ofertaActualizada = $this->model->updateoferta($id_producto, $nombre, $descuento, $id );
-    
-                if($ofertaActualizada){
-                    return $this->view->response(["Oferta actualizada con exito", $ofertaActualizada], 200);
-                }else{
-                    return $this->view->response("Oferta no encontrada", 400);
-                }
-            }else{
-                return $this->view->response("Datos Incompletos", 400);
+             $descuento = $req->body->descuento;
+           
+            if(empty($id_producto) || empty($nombre) || empty($descuento)){
+                return $this->view->response("Faltan completar campos", 401);
             }
     
-        }
-
-
-
-        
-    }
+            $idEditado = $this->model->updateOferta($id_producto, $nombre, $descuento, $id);
     
-  
-        public function getOfertasByCategoria($req) {
+            return $this->view->response($idEditado, 200);
+        }
+          public function getOfertasByCategoria($req) {
             $id = $req->params->id;
 
             $ofertas = $this->model->getOfertasCategoria($id);
