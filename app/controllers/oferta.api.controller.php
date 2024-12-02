@@ -11,8 +11,9 @@ require_once 'app/controllers/api.controller.php';
         parent::__construct();
         $this->model = new OfertaModel();
     }
-      public function getAll() {
-            // Obtener filtros y parámetros de ordenamiento desde la URL
+     /* public function getAll() {
+        //Esta función se encarga de obtener una lista de productos
+      // Obtener filtros y parámetros de ordenamiento desde la URL
          $filtros = [
              'id_producto' => $_GET['id_producto'] ?? null,
              'descuento_min' => $_GET['descuento_min'] ?? null,
@@ -30,10 +31,54 @@ require_once 'app/controllers/api.controller.php';
  
          $ofertas = $this->model->getAll($filtros, $ordenarPor, $orden);
          $this->view->response($ofertas, 200);
- 
-     }
+      //En resumen, esta función permite filtrar y ordenar productos según lo que el usuario especifique en la URL, y responder con los resultados.
+     }*/
+    public  function getAll() {
+        $modelo = new OfertaModel();
+        $ofertas = $modelo->getAll();
+        if($ofertas){
+            return $this->view->response($ofertas, 200);   
+        }else{
+            return $this->view->response("No existe las ofertas", 400);
+        }
+    }
+
+    public  function getAllDesc() {
+        $modelo = new OfertaModel();
+        $ofertas = $modelo->getAllDesc();
+        if($ofertas){
+            return $this->view->response($ofertas, 200);   
+        }else{
+            return $this->view->response("No existe las ofertas", 400);
+        }
+    }
+     public function getAllByColumByOrder($req){
+        $orden = $req->params->orden; //:orden
+        $columna = $req->params->columna; //:columna
+        $modelo = new OfertaModel();
+
+
+        if($orden == "desc"){
+            $ofertas = $modelo->getAllByColumByOrder($columna, $orden);
+        }
+        else if($orden == "asc"){
+            $ofertas = $modelo->getAllByColumByOrder($columna, $orden);
+        }
+        else{
+            return $this->view->response("No existe las ofertas", 400);
+        }
+
+        if($ofertas){
+            return $this->view->response($ofertas, 200);   
+        }else{
+            return $this->view->response("No existe las ofertas", 400);
+        }
+    }
+     
+    
+    
         
-         public function get($req){
+         public function get($req){ // Esta función se utiliza para obtener una oferta específica según su identificador ( id)
         $id = $req->params->id;
         $oferta = $this->model->getOfertas($id);
 
@@ -43,7 +88,7 @@ require_once 'app/controllers/api.controller.php';
             return $this->view->response("No existe la oferta con el id = $id", 400);
         }
     } 
-         public function create(){
+         public function create(){ //crea una nueva oferta
         $data = $this->getData();
 
         if(isset($data->id_producto, $data->nombre, $data->descuento)){
@@ -78,7 +123,7 @@ require_once 'app/controllers/api.controller.php';
             $idEditado = $this->model->updateOferta($id_producto, $nombre, $descuento, $id);
     
             return $this->view->response($idEditado, 200);
-        }
+        } //En resumen, esta función permite actualizar una oferta existente, asegurándose de que la oferta existe y que todos los campos necesarios estén completos antes de realizar la actualización.
           public function getOfertasByCategoria($req) {
             $id = $req->params->id;
 

@@ -8,6 +8,8 @@ $router = new Router();
 // define la tabla de ruteo
 #                 endpoint         verbo        controller                     método
 $router->addRoute('ofertas',        'GET',       'OfertaApiController',         'getAll');
+$router->addRoute('ofertas/desc',        'GET',       'OfertaApiController',    'getAllDesc');
+$router->addRoute('ofertas/:columna/:orden',        'GET',       'OfertaApiController',    'getAllByColumByOrder');
 $router->addRoute('ofertas',        'POST',      'OfertaApiController',         'create');
 $router->addRoute('oferta/:id',     'GET',       'OfertaApiController',         'get');
 $router->addRoute('oferta/:id',     'PUT',       'OfertaApiController',         'updateOferta');

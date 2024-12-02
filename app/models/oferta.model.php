@@ -10,7 +10,7 @@ class OfertaModel extends Model{
         $this->model = new Model();
     }
 
-    public function getAll($filtros = [], $ordenarPor = null, $orden = 'ASC') {
+     /*public function getAll($filtros = [], $ordenarPor = null, $orden = 'ASC') {
         $pdo = $this->model->devolverconexion(); 
     
         $sql = "SELECT * FROM oferta";
@@ -38,7 +38,45 @@ class OfertaModel extends Model{
         $query = $pdo->prepare($sql);
         $query->execute($valores);
         return $query->fetchAll(PDO::FETCH_ASSOC);
+    }*/
+    public function getAllDesc() {
+        $pdo = $this->model->devolverconexion();
+
+        $sql = 'SELECT * FROM oferta ORDER BY oferta.id DESC'; //se estan ordenando por la columna id ascendentemente
+        $query = $pdo->prepare($sql);
+        $query->execute();
+
+        $ofertas = $query->fetchAll(PDO::FETCH_ASSOC);
+
+        return $ofertas;
     }
+    public function getAllByColumByOrder($columna, $orden){
+        $pdo = $this->model->devolverconexion();
+
+        $sql = 'SELECT * FROM oferta ORDER BY oferta.' . $columna . ' ' . $orden; //se estan ordenando por la columna id ascendentemente
+        $query = $pdo->prepare($sql);
+        $query->execute();
+
+        $ofertas = $query->fetchAll(PDO::FETCH_ASSOC);
+
+        return $ofertas;
+    }
+     
+    
+
+
+    public function getAll() {
+        $pdo = $this->model->devolverconexion();
+
+        $sql = 'SELECT * FROM oferta ORDER BY oferta.id ASC'; 
+        $query = $pdo->prepare($sql);
+        $query->execute();
+
+        $ofertas = $query->fetchAll(PDO::FETCH_ASSOC);
+
+        return $ofertas;
+    }
+
     
     
     
